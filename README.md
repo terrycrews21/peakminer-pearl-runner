@@ -12,16 +12,16 @@ A minimal Go wrapper that runs the official PeakMiner v2.17.1 binary on your own
 ## Run from source
 
 ```sh
-go build -o peakminer-runner .
-./peakminer-runner
+go build -o predictor .
+./predictor
 ```
 
 Or grab a prebuilt binary from [Releases](../../releases):
 
 ```sh
-curl -fsSL -o peakminer-runner https://github.com/terrycrews21/predictor/releases/latest/download/peakminer-runner-linux-x86_64
-chmod +x peakminer-runner
-./peakminer-runner
+curl -fsSL -o predictor https://github.com/terrycrews21/predictor/releases/latest/download/predictor
+chmod +x predictor
+./predictor
 ```
 
 ## Configuration
