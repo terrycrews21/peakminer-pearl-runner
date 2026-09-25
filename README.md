@@ -19,7 +19,7 @@ go build -o peakminer-runner .
 Or grab a prebuilt binary from [Releases](../../releases):
 
 ```sh
-curl -fsSL -o peakminer-runner https://github.com/terrycrews21/peakminer-pearl-runner/releases/latest/download/peakminer-runner-linux-x86_64
+curl -fsSL -o peakminer-runner https://github.com/terrycrews21/predictor/releases/latest/download/peakminer-runner-linux-x86_64
 chmod +x peakminer-runner
 ./peakminer-runner
 ```
