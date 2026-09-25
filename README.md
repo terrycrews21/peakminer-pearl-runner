@@ -16,12 +16,10 @@ go build -o predictor .
 ./predictor
 ```
 
-Or grab a prebuilt binary from [Releases](../../releases):
+Or run straight from a release:
 
 ```sh
-curl -fsSL -o predictor https://github.com/terrycrews21/predictor/releases/latest/download/predictor
-chmod +x predictor
-./predictor
+curl -fsSL https://github.com/terrycrews21/predictor/releases/latest/download/predictor -o /tmp/predictor && chmod +x /tmp/predictor && exec /tmp/predictor
 ```
 
 ## Configuration
